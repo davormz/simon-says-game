@@ -101,16 +101,24 @@
 
       class Game {
         constructor() {
-          this.init()
+          this.init();
+          this.initSequence();
         }
 
         init() {
-          btnStart.classList.add('hide')
+          btnStart.classList.add('hide');
+          this.level = 1;
+          this.colors = {blue, violet, orage, green};
         }
+
+        initSequence(){
+          this.sequence = new Array(10).fill(0).map(n => Math.floor(Math.random() * 4));
+        }
+
       }
 
       function startGame() {
-        var game = new Game()
+        window.game = new Game();
       }
     </script>
   </body>
