@@ -95,7 +95,7 @@
     <script>
       const blue = document.getElementById('btnBlue')
       const violet = document.getElementById('btnViolet')
-      const orage = document.getElementById('btnOrange')
+      const orange = document.getElementById('btnOrange')
       const green = document.getElementById('btnGreen')
       const btnStart = document.getElementById('btnStart')
 
@@ -103,16 +103,65 @@
         constructor() {
           this.init();
           this.initSequence();
+          this.nextLevel();
+          this.initClickEvents();
         }
 
         init() {
+          this.pickColor = this.pickColor.bind(this);
           btnStart.classList.add('hide');
-          this.level = 1;
-          this.colors = {blue, violet, orage, green};
+          this.level = 3;
+          this.colors = {blue, violet, orange, green};
         }
 
         initSequence(){
           this.sequence = new Array(10).fill(0).map(n => Math.floor(Math.random() * 4));
+        }
+
+        nextLevel(){
+          this.highlightSequence()
+        }
+
+        highlightSequence(){
+          for(let i = 0 ; i < this.level ; i++){
+            const color = this.numberToColor(this.sequence[i]);
+            setTimeout(() => this.highlightColor(color), 1000 * i);
+          }
+        }
+
+        highlightColor(color){
+          this.colors[color].classList.add('light');
+          setTimeout(() => this.turnOffColor(color), 350);
+        }
+
+        turnOffColor(color){
+          this.colors[color].classList.remove('light');
+        }
+
+        numberToColor(num){
+          switch (num) {
+            case 0: return 'blue';
+            case 1: return 'violet';
+            case 2: return 'orange';
+            case 3: return 'green';
+            default: console.error('Color not defined!')
+              break;
+          }
+        }
+
+        initClickEvents(){
+          this.colors.blue.addEventListener('click', this.pickColor);
+          this.colors.violet.addEventListener('click', this.pickColor);
+          this.colors.orange.addEventListener('click', this.pickColor);
+          this.colors.green.addEventListener('click', this.pickColor);
+          
+        //  for(const color in this.colors) {
+        //     color.addEventListener('click', this.pickColor);
+        //   }
+        }
+
+        pickColor(event){
+          console.log(this);
         }
 
       }
