@@ -86,40 +86,54 @@
   </head>
   <body>
     <div class="gameboard">
-      <div id="btnBlue" class="color blue left" data-color="celeste"></div>
-      <div id="btnViolet" class="color violet right" data-color="violeta"></div>
-      <div id="btnOrange" class="color orange left" data-color="naranja"></div>
-      <div id="btnGreen" class="color green right" data-color="verde"></div>
+      <div id="btnBlue" class="color blue left" data-color="blue"></div>
+      <div id="btnViolet" class="color violet right" data-color="violet"></div>
+      <div id="btnOrange" class="color orange left" data-color="orange"></div>
+      <div id="btnGreen" class="color green right" data-color="green"></div>
       <button id="btnStart" class="btn-start" onclick="startGame()">Start Game!</button>
     </div>
     <script>
-      const blue = document.getElementById('btnBlue')
-      const violet = document.getElementById('btnViolet')
-      const orange = document.getElementById('btnOrange')
-      const green = document.getElementById('btnGreen')
-      const btnStart = document.getElementById('btnStart')
+      const blue = document.getElementById('btnBlue');
+      const violet = document.getElementById('btnViolet');
+      const orange = document.getElementById('btnOrange');
+      const green = document.getElementById('btnGreen');
+      const btnStart = document.getElementById('btnStart');
+      const LAST_LEVEL = 3;
 
       class Game {
         constructor() {
           this.init();
           this.initSequence();
-          this.nextLevel();
           this.initClickEvents();
+          setTimeout(() => {
+            this.nextLevel();
+          }, 200);
+          
         }
 
         init() {
+          this.nextLevel = this.nextLevel.bind(this);
           this.pickColor = this.pickColor.bind(this);
-          btnStart.classList.add('hide');
+          this.toggleBtnStart();
           this.level = 3;
           this.colors = {blue, violet, orange, green};
         }
 
+        toggleBtnStart(){
+          if(btnStart.classList.contains('hide')){
+            btnStart.classList.remove('hide');
+          } else {
+            btnStart.classList.add('hide');
+          }
+        }
+
         initSequence(){
-          this.sequence = new Array(10).fill(0).map(n => Math.floor(Math.random() * 4));
+          this.sequence = new Array(LAST_LEVEL).fill(0).map(n => Math.floor(Math.random() * 4));
         }
 
         nextLevel(){
-          this.highlightSequence()
+          this.subLevel = 0;
+          this.highlightSequence();
         }
 
         highlightSequence(){
@@ -144,8 +158,19 @@
             case 1: return 'violet';
             case 2: return 'orange';
             case 3: return 'green';
-            default: console.error('Color not defined!')
+            default: console.error('Color not defined!');
               break;
+          }
+        }
+
+        colorToNumber(color){
+          switch (color) {
+            case 'blue': return 0;
+            case 'violet': return 1;
+            case 'orange': return 2;
+            case 'green': return 3;
+            default: console.error('Color not defined!');
+            break;
           }
         }
 
@@ -154,14 +179,45 @@
           this.colors.violet.addEventListener('click', this.pickColor);
           this.colors.orange.addEventListener('click', this.pickColor);
           this.colors.green.addEventListener('click', this.pickColor);
-          
-        //  for(const color in this.colors) {
-        //     color.addEventListener('click', this.pickColor);
-        //   }
+        }
+
+        removeClickEvents(){
+          this.colors.blue.removeEventListener('click', this.pickColor);
+          this.colors.violet.removeEventListener('click', this.pickColor);
+          this.colors.orange.removeEventListener('click', this.pickColor);
+          this.colors.green.removeEventListener('click', this.pickColor);
         }
 
         pickColor(event){
-          console.log(this);
+          const colorName = event.target.dataset.color;
+          const colorNumber = this.colorToNumber(colorName);
+          this.highlightColor(colorName);
+          if(colorNumber === this.sequence[this.subLevel]){
+            this.subLevel++;
+            if(this.subLevel === this.level){
+              this.level++;
+
+              if(this.level === (LAST_LEVEL + 1)){
+                this.winGame();
+              } else {
+                setTimeout(this.nextLevel, 1500);
+              }
+            }
+          } else {
+            this.gameOver();
+          }
+
+        }
+
+        winGame(){
+          alert('You won !');
+          this.toggleBtnStart();
+        }
+
+        gameOver(){
+          alert('Game Over!!!');
+          this.removeClickEvents();
+          this.toggleBtnStart();
         }
 
       }
